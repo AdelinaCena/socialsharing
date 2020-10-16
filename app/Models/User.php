@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\Models;
+namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,4 +41,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    /**
+     * Get the posts for the blog user.
+     */
+    public function posts()
+    {
+        return $this->hasMany('App\Models\Posts');
+    }
 }

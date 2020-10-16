@@ -7,5 +7,28 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    //
+	public function getAllPosts()
+	{
+
+	}
+
+	public function view()
+	{
+		
+	}
+
+    public function create() 
+    {
+
+    }
+
+    public function update() 
+    {
+    	
+    }
+
+    public function delete() 
+    {
+    	
+    }
 }
