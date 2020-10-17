@@ -16,11 +16,12 @@ class UserController extends Controller
     public function login(User $route,Request $request) 
     {   
 
-        
         $creds = $request->only(['email', 'password']);
         
         if(!Auth::attempt($creds)) {
-            return response()->json(['message' => 'Invalid login credentials']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid login credentials']);
         }
 
         $tokenResult = Auth::user()->createToken('Personal Access Token');
@@ -30,6 +31,7 @@ class UserController extends Controller
         $token->save();
 
         return response()->json([
+            'success'=> true,
             'token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
@@ -53,13 +55,16 @@ class UserController extends Controller
             $user->save();
 
             return response()->json([
+                'success'=> true,
                 'message' => 'Successfully created user!',
                 'token' => 'no'
             ]);
             
         } catch (Exception $e) {
             \Log::error($e);
-            return $e->getMessage();
+            return response()->json([
+                'success'=> false
+            ]);
         }
 
     }
@@ -68,6 +73,7 @@ class UserController extends Controller
     {
     	$request->user()->token()->revoke();
         return response()->json([
+            'success'=> true,
             'message' => 'Successfully logged out'
         ]);
     }

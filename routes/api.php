@@ -26,6 +26,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 	      'middleware' => 'auth:api',
 	    ], function() {
 	        Route::get('logout', 'UserController@logout');
+	        Route::get('posts', 'PostController@index');
 	    });
 	});
 });
