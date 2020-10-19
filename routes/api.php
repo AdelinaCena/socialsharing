@@ -21,14 +21,14 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 	], function () {
 	    Route::post('login', 'UserController@login');
 	    Route::post('signup', 'UserController@register');
-	  
-	    Route::group([
-	      'middleware' => 'auth:api',
-	    ], function() {
-	        Route::get('logout', 'UserController@logout');
-	        Route::get('posts', 'PostController@index');
-	    });
 	});
-});
 
+	Route::group([
+      'middleware' => 'auth:api',
+    ], function() {
+        Route::get('logout', 'UserController@logout');
+        
+        Route::resource('posts', 'PostController');
+    });
+});
 

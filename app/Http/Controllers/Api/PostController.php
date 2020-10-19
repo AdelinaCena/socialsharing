@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Post;
 
 class PostController extends Controller
@@ -15,13 +18,10 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with(['media', 'user'])->get();
+        $posts = Post::with(['media', 'user'])->latest()->get();
+        $postsCollection = PostResource::collection($posts);
 
-        if ($posts) {
-            return response()->json(['success'=> true,'allPosts' => $posts]);
-        } else {
-            return response()->json(['success'=> false,'allPosts' => $posts]);
-        }
+        return response()->json(['success'=> true, 'allPosts' => $postsCollection]);
     }
 
     /**
@@ -30,9 +30,26 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        //
+        try {
+
+            $input = $request->all();
+            $input['user_id'] = auth()->user()->id;
+            $post = Post::create($input);
+            
+            return response()->json(['success' => true, 'post' => new PostResource($post)]);
+        } catch (\Exception $e) {
+            \Log::error($e);
+
+            return response()->json(
+                [
+                    'success' => false, 
+                    'message' => $e->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     /**
@@ -43,7 +60,8 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        return response()->json(['success' => true, 'post' =>  new PostResource($post)]);
     }
 
     /**
@@ -66,7 +84,25 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+
+            $input = $request->all();
+            
+            $post = Post::findOrFail($id);
+            $post->update($input);
+            
+            return response()->json(['success' => true, 'post' => new PostResource($post)]);
+        } catch (\Exception $e) {
+            \Log::error($e);
+
+            return response()->json(
+                [
+                    'success' => false, 
+                    'message' => $e->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
     /**

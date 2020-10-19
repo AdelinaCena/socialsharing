@@ -36,4 +36,12 @@ class Post extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    /**
+     * 
+     */
+    public function scopeLatest($query)
+    {
+        return $query->orderBy('created_at', 'desc');
+    }
 }

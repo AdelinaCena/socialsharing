@@ -35,7 +35,9 @@ class MediaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($request->hasFile('file')) {
+            $request->file->store();
+        }
     }
 
     /**
