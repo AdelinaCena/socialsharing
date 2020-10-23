@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Models\Media;
+use App\Services\MediaService;
 
 class PostController extends Controller
 {
@@ -30,24 +33,43 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StorePostRequest $request)
+    public function store(Request $request)
     {
-        try {
+        
+        try { 
 
-            $input = $request->all();
+            $input = $request->only(['title', 'text']);
             $input['user_id'] = auth()->user()->id;
+            
             $post = Post::create($input);
             
-            return response()->json(['success' => true, 'post' => new PostResource($post)]);
+            if($post && $request->media) {
+                
+                foreach($request->media as $file) {
+                   
+                    $path = MediaService::UploadFile($file);
+
+                    Media::create([
+                        'url' => $path,
+                        'post_id' => $post->id
+                    ]);
+                }
+            }
+
+            return response()->json(
+                [
+                    'success' => true, 
+                    'post' => new PostResource($post)
+                ]
+            );
+        
         } catch (\Exception $e) {
             \Log::error($e);
 
             return response()->json(
                 [
                     'success' => false, 
-                    'message' => $e->getMessage()
-                ],
-                Response::HTTP_INTERNAL_SERVER_ERROR
+                ]
             );
         }
     }
@@ -61,7 +83,16 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::findOrFail($id);
-        return response()->json(['success' => true, 'post' =>  new PostResource($post)]);
+
+        $media = $post->media()->get();
+
+        return response()->json(
+            [
+                'success' => true, 
+                'post' =>  new PostResource($post),
+                'media' => $media 
+            ]
+        );
     }
 
     /**

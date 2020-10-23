@@ -24,10 +24,11 @@ class StorePostRequest extends FormRequest
     public function rules()
     {
         return [
+
             'title' => 'required|string',
-            'text' => 'required|string',
+            'text' => 'required|',
             'media' => 'nullable|array',
-            'media.*.file' => 'required|file|',//validate for image or video
+            // 'media.*.file' => 'required|file|',//validate for image or video
         ];
     }
 }
