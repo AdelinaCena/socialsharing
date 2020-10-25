@@ -27,11 +27,14 @@ class UserController extends Controller
                 ]
             );
         }
+
         $tokenResult = Auth::user()->createToken('Personal Access Token');
         $token = $tokenResult->token;
-        if ($request->remember_me)
+        
+        if ($request->remember_me){
             $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
+            $token->save();
+        }
 
         return response()->json(
             [
