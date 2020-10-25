@@ -144,6 +144,35 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = Post::findOrFail($id);
+        
+        try {
+            $media = $post->media;
+            
+            if ($media) {
+                foreach ($media as $file) {
+
+                    MediaService::getFileName($file->url);
+                }
+                $post->media()->delete();
+            }
+            
+            $post->delete();
+
+            return response()->json(
+                [
+                    "success" => true,
+                    "message" => "Post deleted successfully!"
+                ]
+            );
+            
+        } catch (Exception $e) {
+            return response()->json(
+                [
+                    "success" => false,
+                    "message" => "Couldn`t delete post , try again later!"
+                ]
+            );
+        }
     }
 }

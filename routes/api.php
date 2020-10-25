@@ -29,7 +29,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
         Route::get('logout', 'UserController@logout');
         
         Route::resource('posts', 'PostController');
-        Route::delete('file/{id}', 'MediaController@destroy');
+        Route::delete('files/{id}', 'MediaController@destroy');
     });
 });
 

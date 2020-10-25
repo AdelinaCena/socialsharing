@@ -23,5 +23,16 @@ namespace App\Services;
 
             return $path;
   	    }
+
+        static function getFileName($full_path)
+        {
+            // split url 
+            $fileName = [];
+            preg_match("/[^\/]+$/", $full_path, $fileName);
+            $name = $fileName[0];
+            
+            // delete file from storage disc
+            unlink(storage_path('app/public/images/'.$name));
+        } 
     }  
 ?>

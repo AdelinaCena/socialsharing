@@ -21,18 +21,28 @@ class MediaController extends Controller
         // find  file of media with id $id
         $media = Media::findOrFail($id);
         
-        // split url 
-        $fileName = [];
-        preg_match("/[^\/]+$/", $media->url, $fileName);
-        $name = $fileName[0];
-        
-        // delete file from database 
-        $media->delete();
+        try {
+            // split url 
+            $fileName = [];
+            preg_match("/[^\/]+$/", $media->url, $fileName);
+            $name = $fileName[0];
+            
+            // delete file from database 
+            $media->delete();
 
-        // delete file from storage disc
-        unlink(storage_path('app/public/images/'.$name));
-        
+                // delete file from storage disc
+                unlink(storage_path('app/public/images/'.$name));
 
-        return "deleted";
+                return response()->json([
+                    "success" => true, 
+                    "message" => "File deleted successfully!"
+                ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                    "success" => false, 
+                    "message" => "There is a problem try again later."
+                ]);
+        }
+        
     }
 }
