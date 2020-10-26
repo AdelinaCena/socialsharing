@@ -29,6 +29,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
         Route::get('logout', 'UserController@logout');
         
         Route::resource('posts', 'PostController');
+        Route::post('posts/files', 'MediaController@store');
         Route::delete('files/{id}', 'MediaController@destroy');
     });
 });

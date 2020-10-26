@@ -5,11 +5,46 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\MediaService;
 use App\Models\Media;
+use App\Models\Post;
 
 class MediaController extends Controller
 {
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $post = Post::findOrFail($request->post_id);
+        
+        try {
+            foreach($request->media as $file) {
+                   
+                $path = MediaService::UploadFile($file);
+
+                Media::create([
+                    'url' => $path,
+                    'post_id' => $post->id
+                ]);
+            }
+
+            return response()->json([
+                "success" => true,
+                "message" => "Files created successfully!"
+            ]);
+
+        } catch(\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "message" => "Couldn`t create file. Please try again later!"
+            ]);
+        } 
+    }
     /**
      * Remove the specified resource from storage.
      *
